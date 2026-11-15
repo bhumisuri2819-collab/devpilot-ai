@@ -2,83 +2,110 @@
 
 **An MCP-powered GitHub Repository Intelligence Assistant**
 
-DevPilot AI connects a Python MCP client to a GitHub MCP server and uses Google Gemini to help developers explore public GitHub repositories through natural-language questions.
+DevPilot AI is an AI-powered GitHub Repository Intelligence Assistant built using the **Model Context Protocol (MCP)** and **Google Gemini**. It enables developers to explore public GitHub repositories, understand codebases, and inspect repository activity through natural-language conversations.
 
-## Features
+##  Features
 
-The GitHub MCP server currently exposes six read-only tools:
+DevPilot currently provides six read-only GitHub tools:
 
-- **Repository information** — view repository metadata such as description, language, stars, forks and default branch.
-- **List repository files** — browse files and directories.
-- **Read repository files** — retrieve the contents of supported text files.
-- **Repository issues** — inspect issues and their details.
-- **Pull requests** — inspect pull requests, branches and status.
-- **Recent commits** — review recent commit messages and authors.
+- **Repository Information** — Retrieve repository metadata, including description, programming language, stars, forks, and default branch.
+- **List Repository Files** — Browse repository files and directory structures.
+- **Read Repository Files** — Retrieve the contents of supported text files.
+- **Repository Issues** — Explore repository issues and their details.
+- **Pull Requests** — Inspect pull requests, branches, and their status.
+- **Recent Commits** — Review recent commits, messages, and authors.
 
-## Architecture
+##  Architecture
 
 ```text
-User
- |
- v
-Python MCP Client  <---->  Google Gemini
- |
- | MCP over stdio
- v
-GitHub MCP Server
- |
- | GitHub REST API
- v
-Public GitHub Repositories
+                   User
+                    |
+                    v
+              Python MCP Client
+                    |
+             Google Gemini API
+                    |
+             Tool Call Requests
+                    |
+                    v
+              MCP Communication
+                (stdio)
+                    |
+                    v
+              GitHub MCP Server
+                    |
+              GitHub REST API
+                    |
+                    v
+          Public GitHub Repositories
 ```
 
-The client discovers the tools exposed by the MCP server and makes them available to Gemini. Gemini can request tool calls, and the client executes those calls through the MCP connection.
+The MCP client discovers the tools exposed by the GitHub server and makes them available to Gemini. Based on the user's natural-language request, Gemini can request the appropriate tool calls. The client executes these calls through the MCP connection and returns the results.
 
-## Project structure
+##  Project Structure
 
 ```text
 devpilot/
 ├── mcp-client-python/
 │   ├── client.py
 │   ├── pyproject.toml
+│   ├── .env.example
 │   └── README.md
+│
 ├── github-server/
 │   ├── github_server.py
 │   ├── pyproject.toml
 │   └── README.md
+│
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
-## Requirements
+##  Requirements
 
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/)
-- A Google Gemini API key
+- Google Gemini API key
 
-## Setup
+##  Setup and Installation
 
-### 1. Configure the Gemini API key
+### 1. Clone the repository
 
-In `mcp-client-python`, create a `.env` file:
+```bash
+git clone https://github.com/bhumisuri2819-collab/devpilot.git
+cd devpilot
+```
+
+### 2. Configure the API key
+
+Navigate to `mcp-client-python` and create a `.env` file using `.env.example` as a reference.
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Do not commit `.env` or share your API key publicly.
+**Important:** Never commit your `.env` file or expose your API key publicly.
 
-### 2. Install and run
+### 3. Install dependencies
 
-Open a terminal in `mcp-client-python` and run:
+From the `mcp-client-python` directory:
 
 ```bash
 uv sync
+```
+
+### 4. Run DevPilot
+
+```bash
 uv run client.py uv --directory ../github-server run github_server.py
 ```
 
-The client starts the GitHub MCP server over standard input/output (stdio), discovers its tools, and starts the interactive chat.
+The client launches the GitHub MCP server using standard input/output (stdio), discovers its available tools, and starts the interactive chat.
 
-## Example questions
+##  Example Queries
+
+Try asking DevPilot:
 
 - What does `owner/repository` do?
 - Show me the files in the `src` directory.
@@ -87,14 +114,26 @@ The client starts the GitHub MCP server over standard input/output (stdio), disc
 - Summarise the latest pull requests.
 - Show the most recent commits.
 
-Replace `owner` and `repository` with a public GitHub repository's owner and name.
+Replace `owner` and `repository` with the owner and name of a public GitHub repository.
 
-## Current scope and limitations
+##  Current Scope and Limitations
 
-- The current tools are designed for **public GitHub repositories**.
-- The server exposes read-only operations; it does not create issues, merge pull requests, push commits or modify repositories.
-- Integration testing with Gemini and the complete local setup is still pending. Behaviour may vary with API availability, model configuration and repository rate limits.
+- Currently designed to work with **public GitHub repositories**.
+- All exposed GitHub tools are read-only.
+- Does not create issues, merge pull requests, push commits, or modify repositories.
+- Full end-to-end integration testing with Gemini is still pending.
 
-## Attribution
+Behaviour may depend on API availability, model configuration, and GitHub API rate limits.
 
-DevPilot AI is adapted from the Python MCP client and server examples in the [Model Context Protocol Quickstart Resources](https://github.com/modelcontextprotocol/quickstart-resources). The GitHub-specific tools and Gemini integration are project modifications. Please retain and follow the original repository's license and attribution requirements.
+##  Future Improvements
+
+- Persistent multi-turn conversation history.
+- Advanced code search and repository exploration.
+- Contributor insights and repository analytics.
+- Expanded repository intelligence capabilities.
+
+##  Attribution
+
+DevPilot AI is adapted from the Python MCP client and server examples in the [Model Context Protocol Quickstart Resources](https://github.com/modelcontextprotocol/quickstart-resources).
+
+The GitHub-specific tools and Gemini integration are project modifications. Original license and attribution requirements are retained.
